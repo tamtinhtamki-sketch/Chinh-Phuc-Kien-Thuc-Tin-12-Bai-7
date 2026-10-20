@@ -1,0 +1,6 @@
+{
+  "name": "Đấu Trí Tin Học 12: HTML & Cấu Trúc Trang Web (Bài 7 KNTT)",
+  "description": "Ứng dụng trò chơi học tập tương tác bám sát Bài 7 Tin học 12 KNTT với 3 phần trò chơi: Trang web và HTML, Cấu trúc cơ bản tệp HTML, và Phần mềm soạn thảo HTML. Hỗ trợ bảng xếp hạng, bốc thăm học sinh, quản lý thi đấu nhóm/cá nhân và xuất file HTML đơn nhất.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

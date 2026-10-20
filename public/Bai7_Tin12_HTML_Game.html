@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Đấu Trí Tin Học 12: HTML & Cấu Trúc Trang Web (Bài 7 KNTT)</title>
+  <style>
+    /* Reset & Base Styles */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: #0f172a;
+      color: #f8fafc;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      line-height: 1.5;
+    }
+    header {
+      background: #1e293b;
+      border-bottom: 2px solid #3b82f6;
+      padding: 1rem 1.5rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+    }
+    .brand { display: flex; align-items: center; gap: 0.75rem; }
+    .brand-icon {
+      width: 42px; height: 42px; background: linear-gradient(135deg, #3b82f6, #8b5cf6);
+      border-radius: 10px; display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 1.25rem; color: #fff;
+    }
+    .brand-title { font-size: 1.2rem; font-weight: 700; color: #fff; }
+    .brand-sub { font-size: 0.85rem; color: #94a3b8; }
+    .nav-buttons { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+    button {
+      cursor: pointer;
+      font-family: inherit;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+    .btn-nav {
+      background: #334155; color: #e2e8f0; padding: 0.5rem 0.85rem; font-size: 0.9rem;
+    }
+    .btn-nav:hover, .btn-nav.active { background: #2563eb; color: #fff; }
+    .btn-primary {
+      background: linear-gradient(135deg, #2563eb, #3b82f6); color: #fff;
+      padding: 0.75rem 1.5rem; font-size: 1rem; box-shadow: 0 4px 12px rgba(37,99,235,0.3);
+    }
+    .btn-primary:hover { opacity: 0.95; transform: translateY(-1px); }
+    .container { max-width: 1200px; margin: 0 auto; padding: 1.5rem; flex: 1; width: 100%; }
+
+    /* Cards */
+    .card {
+      background: #1e293b; border: 1px solid #334155; border-radius: 12px;
+      padding: 1.5rem; margin-bottom: 1.5rem; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.3);
+    }
+    .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.25rem; }
+
+    /* Section highlight badges */
+    .badge {
+      display: inline-block; padding: 0.25rem 0.6rem; border-radius: 6px;
+      font-size: 0.75rem; font-weight: 700; text-transform: uppercase;
+    }
+    .badge-blue { background: rgba(59,130,246,0.2); color: #60a5fa; border: 1px solid #3b82f6; }
+    .badge-emerald { background: rgba(16,185,129,0.2); color: #34d399; border: 1px solid #10b981; }
+    .badge-purple { background: rgba(168,85,247,0.2); color: #c084fc; border: 1px solid #a855f7; }
+
+    /* Quiz styling */
+    .question-box { margin-bottom: 1.5rem; }
+    .question-text { font-size: 1.2rem; font-weight: 700; color: #f1f5f9; margin: 0.5rem 0 1rem; }
+    .code-view {
+      background: #090d16; border: 1px solid #1e293b; border-radius: 8px;
+      padding: 0.85rem; font-family: monospace; font-size: 0.95rem; color: #38bdf8;
+      margin-bottom: 1rem; overflow-x: auto;
+    }
+    .options-grid { display: grid; gap: 0.75rem; }
+    .option-btn {
+      background: #0f172a; border: 2px solid #334155; border-radius: 10px;
+      padding: 1rem; text-align: left; color: #cbd5e1; font-size: 1rem;
+      transition: all 0.2s; width: 100%; justify-content: flex-start;
+    }
+    .option-btn:hover { border-color: #3b82f6; background: #1e293b; color: #fff; }
+    .option-btn.correct { border-color: #10b981; background: rgba(16,185,129,0.2); color: #a7f3d0; font-weight: 700; }
+    .option-btn.wrong { border-color: #ef4444; background: rgba(239,68,68,0.2); color: #fecaca; }
+
+    /* Tree Diagram */
+    .tree-view {
+      background: #0b1120; border: 1px solid #1e293b; border-radius: 10px;
+      padding: 1.25rem; font-family: monospace; line-height: 1.8;
+    }
+    .tree-node { color: #f59e0b; font-weight: bold; }
+    .tree-sub { color: #38bdf8; margin-left: 1.5rem; }
+    .tree-leaf { color: #4ade80; margin-left: 3rem; }
+
+    /* Modals */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.75); display: none;
+      align-items: center; justify-content: center; padding: 1rem; z-index: 999;
+    }
+    .modal-content {
+      background: #1e293b; border: 1px solid #475569; border-radius: 14px;
+      max-width: 650px; width: 100%; max-height: 90vh; overflow-y: auto; padding: 1.75rem;
+    }
+
+    /* Wheel / Slot */
+    .wheel-box {
+      border: 3px dashed #3b82f6; border-radius: 16px; padding: 2rem;
+      text-align: center; background: #0f172a; margin: 1.5rem 0;
+    }
+    .wheel-name {
+      font-size: 2.2rem; font-weight: 800; color: #fbbf24; min-height: 60px;
+      display: flex; align-items: center; justify-content: center;
+      text-shadow: 0 0 20px rgba(251,191,36,0.4);
+    }
+
+    /* Live HTML Editor */
+    .sandbox-container { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; height: 350px; }
+    @media(max-width: 768px) { .sandbox-container { grid-template-columns: 1fr; height: auto; } }
+    .code-editor {
+      width: 100%; height: 100%; min-height: 200px; background: #0b1120; color: #f8fafc;
+      border: 1px solid #334155; border-radius: 8px; padding: 0.85rem; font-family: monospace;
+      font-size: 0.9rem; resize: none;
+    }
+    .preview-box {
+      background: #ffffff; color: #000000; border-radius: 8px; padding: 0.85rem;
+      overflow: auto; min-height: 200px;
+    }
+
+    /* Scoreboard */
+    table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+    th, td { padding: 0.75rem; text-align: left; border-bottom: 1px solid #334155; }
+    th { color: #94a3b8; font-weight: 600; font-size: 0.85rem; text-transform: uppercase; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">
+      <div class="brand-icon">&lt;/&gt;</div>
+      <div>
+        <div class="brand-title">Đấu Trí Tin Học 12: HTML & Cấu Trúc Trang Web</div>
+        <div class="brand-sub">Bài 7 - Sách Kết nối tri thức với cuộc sống (Trang 39 - 45)</div>
+      </div>
+    </div>
+    <div class="nav-buttons">
+      <button class="btn-nav active" onclick="switchTab('summary')">📖 Tổng Hợp Toàn Bộ Kiến Thức</button>
+      <button class="btn-nav" onclick="switchTab('game1')">1. Trang Web & HTML</button>
+      <button class="btn-nav" onclick="switchTab('game2')">2. Cấu Trúc HTML & Cây DOM</button>
+      <button class="btn-nav" onclick="switchTab('game3')">3. Phần Mềm Soạn Thảo</button>
+      <button class="btn-nav" onclick="openPicker()">🎲 Bốc Thăm Ngẫu Nhiên</button>
+      <button class="btn-nav" onclick="openLeaderboard()">🏆 Bảng Điểm SQLite</button>
+      <button class="btn-nav" onclick="openGuide()">📖 Sổ Tay Giáo Viên</button>
+    </div>
+  </header>
+
+  <div class="container">
+    <!-- Top Status Banner -->
+    <div style="display:flex; justify-content:space-between; align-items:center; background:#1e293b; padding:0.75rem 1.25rem; border-radius:10px; margin-bottom:1.5rem; border:1px solid #334155;">
+      <div>
+        <span style="color:#94a3b8; font-size:0.9rem;">Người chơi/Nhóm: </span>
+        <strong id="currentPlayerDisplay" style="color:#38bdf8;">Đội Lớp 12</strong>
+        <button style="margin-left:0.5rem; background:transparent; color:#60a5fa; font-size:0.8rem; text-decoration:underline;" onclick="changePlayerName()">[Đổi tên]</button>
+      </div>
+      <div style="display:flex; gap:1.5rem; font-weight:700;">
+        <div>Điểm số: <span id="scoreDisplay" style="color:#f59e0b; font-size:1.25rem;">0</span></div>
+        <div>Câu đúng: <span id="correctDisplay" style="color:#10b981; font-size:1.25rem;">0</span></div>
+      </div>
+    </div>
+
+    <!-- TAB 0: TỔNG HỢP KIẾN THỨC -->
+    <div id="tab-summary" class="tab-content">
+      <div class="card">
+        <h2 style="color:#38bdf8; margin-bottom:0.75rem;">📖 Tổng Hợp Toàn Bộ Kiến Thức Bài 7 (Tin Học 12 KNTT)</h2>
+        <p style="color:#94a3b8; font-size:0.9rem; margin-bottom:1.25rem;">Bám sát chuẩn sách giáo khoa trang 39 - 45</p>
+
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:1rem; margin-bottom:1.5rem;">
+          <div style="background:#0f172a; padding:1rem; border-radius:10px; border:1px solid #334155;">
+            <h4 style="color:#60a5fa; margin-bottom:0.5rem;">1. Trang Web & HTML</h4>
+            <ul style="font-size:0.85rem; color:#cbd5e1; line-height:1.6; padding-left:1.2rem;">
+              <li><strong>HTML:</strong> Hypertext Markup Language (ngôn ngữ đánh dấu siêu văn bản).</li>
+              <li><strong>Tệp mở rộng:</strong> .html hoặc .htm.</li>
+              <li><strong>Thẻ HTML:</strong> Đặt trong cặp &lt; và &gt;. Tên thẻ không phân biệt chữ hoa, chữ thường.</li>
+              <li><strong>Thẻ đơn:</strong> &lt;hr/&gt; (kẻ ngang), &lt;br/&gt; (ngắt dòng), &lt;img&gt;.</li>
+              <li><strong>Phần tử HTML:</strong> Thẻ mở + nội dung + thẻ đóng.</li>
+              <li><strong>&lt;!DOCTYPE html&gt;:</strong> Thông báo kiểu tệp html5 cho trình duyệt, KHÔNG là phần tử HTML.</li>
+            </ul>
+          </div>
+
+          <div style="background:#0f172a; padding:1rem; border-radius:10px; border:1px solid #334155;">
+            <h4 style="color:#34d399; margin-bottom:0.5rem;">2. Cấu Trúc Cơ Bản & Cây DOM</h4>
+            <ul style="font-size:0.85rem; color:#cbd5e1; line-height:1.6; padding-left:1.2rem;">
+              <li><strong>Nút gốc (root):</strong> &lt;html&gt; là phần tử gốc bắt buộc và duy nhất.</li>
+              <li><strong>Nhánh &lt;head&gt;:</strong> Chứa thông tin chung: &lt;title&gt; (tên trang web, chỉ văn bản, không chứa thẻ con), &lt;meta charset="utf-8"&gt; (mã hóa Unicode).</li>
+              <li><strong>Nhánh &lt;body&gt;:</strong> Chứa thông tin nội dung hiển thị: &lt;h1..h6&gt; (tiêu đề giảm cấp dần), &lt;p&gt; (đoạn văn).</li>
+              <li><strong>Cây DOM:</strong> Quan hệ cha - con (lồng nhau).</li>
+            </ul>
+          </div>
+
+          <div style="background:#0f172a; padding:1rem; border-radius:10px; border:1px solid #334155;">
+            <h4 style="color:#c084fc; margin-bottom:0.5rem;">3. Phần Mềm Soạn Thảo</h4>
+            <ul style="font-size:0.85rem; color:#cbd5e1; line-height:1.6; padding-left:1.2rem;">
+              <li><strong>Đơn giản:</strong> Notepad (Windows), TextEdit (macOS).</li>
+              <li><strong>Chuyên nghiệp:</strong> Notepad++ (Language -> H -> HTML), Sublime Text (View -> Syntax -> HTML).</li>
+              <li><strong>Trực tuyến:</strong> w3schools.com, tutorialspoint.com (khung trái gõ mã, nháy Run xem kết quả khung phải).</li>
+              <li><strong>Trình duyệt web:</strong> Chrome, Cốc Cốc, Edge, Firefox (hiển thị trang, không dùng soạn mã).</li>
+              <li><strong>Lịch sử:</strong> Tim Berners-Lee (1990 CERN), bản đầu tiên 1991, HTML5 ra đời năm 2014.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div style="text-align:center;">
+          <button class="btn-primary" onclick="switchTab('game1')">Bắt Đầu Chinh Phục Câu Hỏi Phần 1 ➜</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 1: PHẦN 1 -->
+    <div id="tab-game1" class="tab-content" style="display:none;">
+      <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+          <span class="badge badge-blue">Phần 1: Trang Web và HTML</span>
+          <span style="color:#94a3b8; font-size:0.85rem;" id="p1-progress">Câu hỏi 1 / 9</span>
+        </div>
+        <div id="quiz-p1-container"></div>
+      </div>
+    </div>
+
+    <!-- TAB 2: PHẦN 2 -->
+    <div id="tab-game2" class="tab-content" style="display:none;">
+      <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+          <span class="badge badge-emerald">Phần 2: Cấu Trúc Cơ Bản Của Một Tệp HTML</span>
+          <span style="color:#94a3b8; font-size:0.85rem;" id="p2-progress">Câu hỏi 1 / 8</span>
+        </div>
+        
+        <div class="tree-view" style="margin-bottom:1.5rem;">
+          <div style="font-size:0.85rem; color:#94a3b8; margin-bottom:0.5rem;">Sơ đồ Cây Thông Tin HTML (Hình 7.4 SGK Trang 42):</div>
+          <div>&lt;!DOCTYPE html&gt; <span style="color:#64748b;">(Khai báo kiểu tệp, không là phần tử)</span></div>
+          <div class="tree-node">└── &lt;html&gt; (Nút Gốc - Duy nhất)</div>
+          <div class="tree-sub">├── &lt;head&gt; (Thông tin chung)</div>
+          <div class="tree-leaf">│   ├── &lt;meta charset="utf-8"&gt; (Mã hóa Unicode)</div>
+          <div class="tree-leaf">│   └── &lt;title&gt; (Tên trang web - Chỉ văn bản)</div>
+          <div class="tree-sub">└── &lt;body&gt; (Nội dung hiển thị)</div>
+          <div class="tree-leaf">    ├── &lt;h1&gt; (Tiêu đề cấp 1)</div>
+          <div class="tree-leaf">    ├── &lt;p&gt; (Đoạn văn) ─── &lt;em&gt; (In nghiêng)</div>
+          <div class="tree-leaf">    └── &lt;hr/&gt; (Đường kẻ ngang)</div>
+        </div>
+
+        <div id="quiz-p2-container"></div>
+      </div>
+    </div>
+
+    <!-- TAB 3: PHẦN 3 -->
+    <div id="tab-game3" class="tab-content" style="display:none;">
+      <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+          <span class="badge badge-purple">Phần 3: Phần Mềm Soạn Thảo HTML</span>
+          <span style="color:#94a3b8; font-size:0.85rem;" id="p3-progress">Câu hỏi 1 / 6</span>
+        </div>
+        
+        <div id="quiz-p3-container"></div>
+
+        <hr style="border:0; border-top:1px solid #334155; margin: 1.5rem 0;">
+
+        <!-- Live Editor Playground (Hình 7.6 SGK) -->
+        <h3 style="color:#38bdf8; margin-bottom:0.75rem;">💻 Phòng Thí Nghiệm Soạn Thảo Trực Tuyến (Mô phỏng W3Schools SGK Trang 44)</h3>
+        <p style="color:#94a3b8; font-size:0.9rem; margin-bottom:1rem;">
+          Học sinh hãy gõ hoặc chỉnh sửa mã HTML bên trái, rồi nhấn <strong>"Chạy thử (Run)"</strong> để xem kết quả hiển thị ngay bên phải!
+        </p>
+        <div class="sandbox-container">
+          <div>
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.5rem;">
+              <span style="font-size:0.85rem; color:#94a3b8; font-weight:600;">Khung Soạn Thảo Mã Nguồn</span>
+              <button class="btn-primary" style="padding:0.4rem 1rem; font-size:0.85rem;" onclick="runSandboxCode()">▶ Nháy nút Run</button>
+            </div>
+            <textarea id="sandboxCode" class="code-editor">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;title&gt;Trang Web Đầu Tiên Của Em&lt;/title&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    &lt;h1 style="color: #2563eb;"&gt;Chào mừng đến với Tin học 12 KNTT!&lt;/h1&gt;
+    &lt;hr&gt;
+    &lt;p&gt;HTML là &lt;b&gt;ngôn ngữ đánh dấu siêu văn bản&lt;/b&gt;.&lt;/p&gt;
+    &lt;p style="color: green;"&gt;Em đã thực hành soạn thảo thành công!&lt;/p&gt;
+  &lt;/body&gt;
+&lt;/html&gt;</textarea>
+          </div>
+          <div>
+            <div style="margin-bottom:0.5rem; font-size:0.85rem; color:#94a3b8; font-weight:600;">Kết Quả Hiển Thị Trên Trình Duyệt:</div>
+            <div id="sandboxPreview" class="preview-box"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: RANDOM PICKER (BỐC THĂM HỌC SINH / NHÓM) -->
+  <div id="pickerModal" class="modal-overlay">
+    <div class="modal-content">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+        <h2 style="color:#fbbf24;">🎲 Bốc Thăm Học Sinh / Nhóm Trả Lời</h2>
+        <button onclick="closePicker()" style="background:transparent; color:#94a3b8; font-size:1.5rem;">&times;</button>
+      </div>
+      <p style="color:#cbd5e1; font-size:0.95rem;">Giáo viên nhấn nút để chọn ngẫu nhiên một bạn học sinh hoặc nhóm trả lời câu hỏi bài học!</p>
+      
+      <div class="wheel-box">
+        <div id="pickerResult" class="wheel-name">Bấm để quay...</div>
+        <div id="pickerSub" style="color:#94a3b8; font-size:0.9rem; margin-top:0.5rem;">Sẵn sàng chọn học sinh</div>
+      </div>
+
+      <div style="display:flex; gap:1rem; justify-content:center; margin-bottom:1rem;">
+        <button class="btn-primary" onclick="spinStudent()">🎯 Chọn 1 Học Sinh Ngẫu Nhiên</button>
+        <button class="btn-nav" style="background:#475569;" onclick="spinGroup()">👥 Chọn Nhóm (Tổ)</button>
+      </div>
+      
+      <details style="color:#94a3b8; font-size:0.85rem;">
+        <summary style="cursor:pointer;">Danh sách học sinh mẫu (12 em) - Nhấn để xem</summary>
+        <div style="margin-top:0.5rem; max-height:150px; overflow-y:auto; background:#0f172a; padding:0.5rem; border-radius:6px;">
+          Nguyễn Văn An - Nhóm 1 (Tổ 1)<br>Trần Thị Bình - Nhóm 1 (Tổ 1)<br>Lê Hoàng Cường - Nhóm 1 (Tổ 1)<br>Phạm Minh Đức - Nhóm 2 (Tổ 2)<br>Hoàng Thu Giang - Nhóm 2 (Tổ 2)<br>Đỗ Hải Hà - Nhóm 2 (Tổ 2)<br>Vũ Quốc Hưng - Nhóm 3 (Tổ 3)<br>Đặng Mai Lan - Nhóm 3 (Tổ 3)<br>Bùi Tuấn Nam - Nhóm 3 (Tổ 3)<br>Ngô Phương Oanh - Nhóm 4 (Tổ 4)<br>Lý Trọng Quân - Nhóm 4 (Tổ 4)<br>Trịnh Thanh Thảo - Nhóm 4 (Tổ 4)
+        </div>
+      </details>
+    </div>
+  </div>
+
+  <!-- MODAL: LEADERBOARD SQLITE -->
+  <div id="leaderboardModal" class="modal-overlay">
+    <div class="modal-content">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+        <h2 style="color:#38bdf8;">🏆 Bảng Điểm & Quản Lý SQLite</h2>
+        <button onclick="closeLeaderboard()" style="background:transparent; color:#94a3b8; font-size:1.5rem;">&times;</button>
+      </div>
+      <p style="color:#94a3b8; font-size:0.9rem;">Dữ liệu điểm số được quản lý theo cấu trúc bảng SQLite và lưu trữ cục bộ an toàn.</p>
+      
+      <table id="leaderboardTable">
+        <thead>
+          <tr>
+            <th>Xếp hạng</th>
+            <th>Tên Người chơi / Nhóm</th>
+            <th>Điểm</th>
+            <th>Thời gian</th>
+          </tr>
+        </thead>
+        <tbody id="leaderboardBody"></tbody>
+      </table>
+
+      <div style="margin-top:1.5rem; display:flex; justify-content:space-between;">
+        <button class="btn-nav" style="color:#ef4444;" onclick="resetScores()">Xóa điểm làm lại</button>
+        <button class="btn-primary" onclick="downloadSqliteScript()">📥 Xuất Tệp SQLite (.sql)</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: HƯỚNG DẪN GIÁO VIÊN -->
+  <div id="guideModal" class="modal-overlay">
+    <div class="modal-content">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
+        <h2 style="color:#34d399;">📖 Hướng Dẫn Sư Phạm & Kịch Bản Tổ Chức</h2>
+        <button onclick="closeGuide()" style="background:transparent; color:#94a3b8; font-size:1.5rem;">&times;</button>
+      </div>
+      
+      <div style="font-size:0.95rem; line-height:1.7; color:#e2e8f0;">
+        <h4 style="color:#60a5fa; margin-top:0.75rem;">1. Mục tiêu bài học (Bám sát SGK Tin 12 KNTT):</h4>
+        <ul style="margin-left:1.25rem;">
+          <li>Hiểu và giải thích được cấu trúc của một trang web dưới dạng HTML.</li>
+          <li>Nắm vững khái niệm thẻ (tag), phần tử (element), phân biệt thẻ đơn và thẻ đôi.</li>
+          <li>Nhận biết dòng <code>&lt;!DOCTYPE html&gt;</code> không phải phần tử HTML.</li>
+          <li>Phân biệt phần mềm soạn thảo HTML (Notepad, Notepad++, Sublime Text) với trình duyệt web.</li>
+        </ul>
+
+        <h4 style="color:#60a5fa; margin-top:1rem;">2. Gợi ý tổ chức trong 45 phút trên lớp:</h4>
+        <ul style="margin-left:1.25rem;">
+          <li><strong>Khởi động (7 phút):</strong> Mở game Phần 1. Dùng tính năng <em>"Bốc Thăm Ngẫu Nhiên"</em> gọi 3 học sinh trả lời 3 câu đầu tiên.</li>
+          <li><strong>Khám phá & Luyện tập Phần 2 (18 phút):</strong> Chiếu Sơ đồ Cây Thông Tin HTML lên máy chiếu/TV. Cho các nhóm thi đua sắp xếp thứ tự các thẻ trong cây DOM.</li>
+          <li><strong>Khám phá Phần 3 & Thực hành Live (15 phút):</strong> Chơi game phân loại phần mềm và trình duyệt web. Mời học sinh lên bảng nhập thử thẻ <code>&lt;h1&gt;</code>, <code>&lt;p&gt;</code> vào khung mô phỏng trực tuyến W3Schools.</li>
+          <li><strong>Tổng kết & Trao giải (5 phút):</strong> Mở Bảng Điểm SQLite vinh danh nhóm chiến thắng!</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Embedded Audio Synthesizer (Zero file downloads, 100% reliable)
+    const AudioEngine = {
+      ctx: null,
+      init() {
+        if (!this.ctx) {
+          const AudioCtx = window.AudioContext || window.webkitAudioContext;
+          if (AudioCtx) this.ctx = new AudioCtx();
+        }
+        if (this.ctx && this.ctx.state === 'suspended') this.ctx.resume();
+      },
+      beep(freq, duration, type='sine') {
+        try {
+          this.init();
+          if (!this.ctx) return;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = type;
+          osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+          gain.gain.setValueAtTime(0.1, this.ctx.currentTime);
+          gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + duration);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start();
+          osc.stop(this.ctx.currentTime + duration);
+        } catch(e) {}
+      },
+      playSuccess() {
+        this.beep(523, 0.1, 'triangle');
+        setTimeout(() => this.beep(659, 0.1, 'triangle'), 100);
+        setTimeout(() => this.beep(784, 0.2, 'triangle'), 200);
+      },
+      playWrong() {
+        this.beep(250, 0.15, 'sawtooth');
+        setTimeout(() => this.beep(180, 0.2, 'sawtooth'), 150);
+      },
+      playTick() {
+        this.beep(600, 0.04, 'sine');
+      }
+    };
+
+    // Data Loaded
+    const ALL_QUESTIONS = [{"id":"p1_q1","section":"section1","title":"Khái niệm ngôn ngữ HTML","question":"HTML là viết tắt của cụm từ tiếng Anh nào sau đây?","options":["Hypertext Markup Language (Ngôn ngữ đánh dấu siêu văn bản)","Hyperlink Text Management Language","High Technology Modern Language","Home Tool Markup Language"],"correctAnswerIndex":0,"explanation":"Theo SGK Tin học 12 KNTT (trang 39): HTML là viết tắt của Hypertext Markup Language (ngôn ngữ đánh dấu siêu văn bản), là một bộ quy tắc dùng để thiết lập cấu trúc và hiển thị nội dung trang web.","points":10,"badge":"Khái niệm cốt lõi"},{"id":"p1_q2","section":"section1","title":"Phần mở rộng của tệp trang web","question":"Trang web được thiết lập từ các tệp văn bản thường có phần mở rộng là gì?","options":[".docx hoặc .pdf",".html hoặc .htm",".txt hoặc .rtf",".web hoặc .site"],"correctAnswerIndex":1,"explanation":"Theo SGK Tin 12 (trang 40): Trang web được thiết lập từ các tệp văn bản thường có phần mở rộng là .html hoặc .htm được gọi là trang html.","points":10,"badge":"Tệp trang web"},{"id":"p1_q3","section":"section1","title":"Cú pháp thẻ đánh dấu HTML","question":"Các kí tự đánh dấu đặc biệt của thẻ HTML (HTML tag) được đặt trong cặp dấu nào?","options":["Ngoặc vuông [ ]","Ngoặc nhọn { }","Cặp dấu < và >","Ngoặc đơn ( )"],"correctAnswerIndex":2,"explanation":"SGK trang 40: Các kí tự đánh dấu đặc biệt nằm trong hai dấu \"<\", \">\" được gọi là thẻ đánh dấu HTML (còn gọi là thẻ HTML hay tag).","points":10,"badge":"Cú pháp thẻ"},{"id":"p1_q4","section":"section1","title":"Quy tắc phân biệt chữ hoa, chữ thường","question":"Tên thẻ HTML có phân biệt chữ hoa và chữ thường không?","options":["Có phân biệt, bắt buộc viết HOA toàn bộ","Không phân biệt chữ hoa, chữ thường nhưng mặc định nên viết chữ thường","Bắt buộc chữ đầu viết hoa, chữ sau viết thường","Chỉ có các thẻ đơn mới phân biệt chữ hoa, chữ thường"],"correctAnswerIndex":1,"explanation":"SGK trang 40: \"Tên thẻ HTML không phân biệt chữ hoa, chữ thường nhưng mặc định tên thẻ được viết chữ thường.\"","points":10,"badge":"Quy tắc chuẩn"},{"id":"p1_q5","section":"section1","title":"Thẻ đơn trong HTML","question":"Thẻ nào sau đây là ví dụ về thẻ đơn (chỉ có thẻ bắt đầu, không có thẻ kết thúc riêng biệt)?","options":["<p> và </p>","<h1> và </h1>","<hr/> (dòng kẻ ngang) và <br/> (ngắt xuống dòng)","<div> và </div>"],"correctAnswerIndex":2,"explanation":"SGK trang 40: Các thẻ đơn chỉ có thẻ bắt đầu, có dạng <tên thẻ> hoặc <tên thẻ/>, ví dụ <hr/> (dòng kẻ ngang), <br/> (ngắt xuống dòng).","points":10,"badge":"Thẻ đơn"},{"id":"p1_q6","section":"section1","title":"Xử lý khoảng trắng và phím Enter trong HTML","question":"Khi người soạn thảo gõ nhiều dấu cách liên tiếp hoặc nhấn phím Enter xuống dòng trong mã nguồn HTML, trình duyệt web sẽ xử lý như thế nào?","options":["Trình duyệt hiển thị đúng chính xác số khoảng trắng và dòng Enter đã gõ","Trình duyệt báo lỗi cú pháp mã nguồn","Trình duyệt hiểu nhiều dấu cách là 1 dấu cách và KHÔNG nhận biết phím Enter xuống dòng","Trình duyệt tự động chèn thêm thẻ <br> tại mọi chỗ nhấn Enter"],"correctAnswerIndex":2,"explanation":"SGK trang 40: HTML và trình duyệt không nhận biết được nhiều dấu cách (hiểu là 1 dấu cách). Trình duyệt cũng không nhận biết dấu xuống dòng khi người dùng nhấn Enter trong quá trình soạn thảo. Cần dùng <br/> hoặc chia đoạn <p>.","points":15,"badge":"Nguyên lý hiển thị"},{"id":"p1_q7","section":"section1","title":"Khái niệm Phần tử HTML (element)","question":"Phần tử HTML (HTML element) được định nghĩa bao gồm những thành phần nào?","options":["Chỉ gồm thẻ bắt đầu và tên thuộc tính","Chỉ là phần nội dung văn bản thuần túy","Thẻ bắt đầu, thẻ kết thúc và phần nội dung nằm giữa cặp thẻ đó (hoặc thẻ đơn cùng nội dung)","Chỉ là dòng thông báo <!DOCTYPE html>"],"correctAnswerIndex":2,"explanation":"SGK trang 40: Phần tử HTML thông thường được định nghĩa bởi thẻ bắt đầu, thẻ kết thúc và phần nội dung nằm giữa cặp thẻ này: <tên thẻ> nội dung </tên thẻ>. Các thẻ đơn cùng nội dung của nó cũng được gọi là phần tử HTML.","points":15,"badge":"Phần tử HTML"},{"id":"p1_q8","section":"section1","title":"Bản chất của dòng <!DOCTYPE html>","question":"Dòng đầu tiên trong tệp HTML: <!DOCTYPE html> có vai trò gì và có được xem là phần tử HTML không?","options":["Là phần tử gốc của trang web, chứa toàn bộ trang","Thông báo kiểu của tệp là html cho trình duyệt và KHÔNG được xem là phần tử HTML","Là một thẻ đơn định dạng dòng văn bản đầu tiên","Là phần tử bắt buộc nằm bên trong thẻ <head>"],"correctAnswerIndex":1,"explanation":"SGK trang 41 & 42: \"Dòng đầu tiên của mỗi tệp HTML có dạng <!DOCTYPE html> có vai trò thông báo kiểu của tệp là html và KHÔNG được xem là phần tử HTML.\"","points":15,"badge":"Lưu ý cốt lõi"},{"id":"p1_q9","section":"section1","title":"Cú pháp dòng chú thích trong HTML","question":"Đoạn mã nào sau đây là cú pháp chú thích (comment) hợp lệ trong tệp HTML?","options":["// Đây là dòng chú thích","/* Đây là dòng chú thích */","<!-- Đây là dòng chú thích -->","# Đây là dòng chú thích"],"correctAnswerIndex":2,"explanation":"SGK trang 41: Phần tử HTML đặc biệt có ý nghĩa chú thích trong tệp HTML có dạng: <!-- đây là dòng chú thích -->.","points":10,"badge":"Cú pháp chú thích"},{"id":"p2_q1","section":"section2","title":"Phần tử gốc của tệp HTML","question":"Trong sơ đồ cấu trúc của một tệp HTML, phần tử nào là phần tử gốc (root element) và có bao nhiêu phần tử gốc?","options":["<!DOCTYPE html> là phần tử gốc, có 1 phần tử gốc","Phần tử <html> là phần tử gốc và duy nhất có 1 phần tử gốc","<head> và <body> là 2 phần tử gốc cùng cấp","<title> là phần tử gốc"],"correctAnswerIndex":1,"explanation":"SGK trang 42 & 43: Phần tử <html> là bắt buộc, là phần tử gốc và chứa tất cả các phần tử HTML còn lại của trang web. Cây HTML chỉ có DUY NHẤT một phần tử gốc chính là phần tử <html>.","points":10,"badge":"Phần tử gốc"},{"id":"p2_q2","section":"section2","title":"Hai phần tử con trực tiếp của <html>","question":"Phần tử gốc <html> thông thường chứa đúng hai phần tử con trực tiếp nào?","options":["<title> và <meta>","<h1> và <p>","<head> và <body>","<header> và <footer>"],"correctAnswerIndex":2,"explanation":"SGK trang 42: \"Phần tử <html> thường chứa hai phần tử con <head> và <body>.\"","points":10,"badge":"Cấu trúc 2 nhánh"},{"id":"p2_q3","section":"section2","title":"Nhiệm vụ của phần tử <head>","question":"Phần tử <head> trong tệp HTML có chức năng gì?","options":["Chứa tất cả nội dung văn bản và hình ảnh hiển thị trên trang web","Chứa các phần tử có liên quan chung đến toàn bộ trang web (tiêu đề tab, mã hóa ký tự, liên kết mã...)","Tạo thanh cuộn cho trình duyệt web","Tạo dòng tiêu đề lớn nhất trong trang"],"correctAnswerIndex":1,"explanation":"SGK trang 42: \"Phần tử <head> chứa các phần tử có liên quan chung đến toàn bộ trang web. Trong <head> thường có phần tử <title>, <meta>, <style>, <script>.\"","points":10,"badge":"Khối thông tin chung"},{"id":"p2_q4","section":"section2","title":"Đặc điểm của phần tử <title>","question":"Khẳng định nào sau đây là ĐÚNG về phần tử <title>?","options":["<title> nằm trong <body> và hiển thị dòng chữ to nhất ở giữa trang","<title> nằm trong <head>, hiển thị trên thanh tiêu đề/tab của trình duyệt và chỉ là văn bản thường, KHÔNG chứa phần tử con","<title> có thể chứa các phần tử con như <h1>, <p>, <b>","<title> là phần tử tùy chọn, không xuất hiện trên kết quả tìm kiếm"],"correctAnswerIndex":1,"explanation":"SGK trang 42: \"Phần tử <title> nằm trong <head>. Thẻ <title> mô tả tên của trang web hiện thời, xuất hiện trong danh sách kết quả tìm kiếm. Phần tử <title> phải là văn bản thường và KHÔNG được phép chứa các phần tử con.\"","points":15,"badge":"Thẻ tiêu đề trang"},{"id":"p2_q5","section":"section2","title":"Ý nghĩa của thẻ <meta charset=\"utf-8\">","question":"Thẻ <meta charset=\"utf-8\"> nằm trong <head> dùng để làm gì?","options":["Để định dạng phông chữ to và in đậm toàn trang","Để mô tả cách mã hóa văn bản trên trang web theo chuẩn Unicode UTF-8 (hỗ trợ tiếng Việt không lỗi font)","Để tải hình ảnh về trang web","Để tạo liên kết sang trang web khác"],"correctAnswerIndex":1,"explanation":"SGK trang 42: \"Phần tử <meta charset=\"utf-8\"> mô tả cách mã hoá văn bản trên trang web theo mã UTF-8 (Unicode).\"","points":10,"badge":"Mã hóa ký tự"},{"id":"p2_q6","section":"section2","title":"Nhiệm vụ của phần tử <body>","question":"Phần tử <body> có vai trò gì trong cấu trúc tệp HTML?","options":["Chứa các thông tin cấu hình ẩn của trang web","Chứa tất cả các phần tử thông tin của trang web hiển thị cho người xem (văn bản, ảnh, bảng...)","Chỉ chứa duy nhất thẻ <title>","Chỉ có tác dụng khai báo ngôn ngữ"],"correctAnswerIndex":1,"explanation":"SGK trang 42: \"Phần tử <body> chứa tất cả các phần tử còn lại là thông tin của trang web.\"","points":10,"badge":"Thân trang web"},{"id":"p2_q7","section":"section2","title":"Thứ tự các thẻ tiêu đề văn bản","question":"Nhóm thẻ định dạng tiêu đề nào sau đây được sắp xếp theo thứ tự GIẢM DẦN về kích thước/cấp độ?","options":["<h6>, <h5>, <h4>, <h3>, <h2>, <h1>","<h1>, <h2>, <h3>, <h4>, <h5>, <h6>","<head1>, <head2>, <head3>, <head4>","<title1>, <title2>, <title3>"],"correctAnswerIndex":1,"explanation":"SGK trang 42: \"Nhóm các thẻ định dạng văn bản thường dùng là các thẻ tiêu đề theo thứ tự giảm cấp dần là <h1>, <h2>, <h3>, <h4>, <h5>, <h6>. Thẻ <p> mô tả một đoạn văn bản hoàn chỉnh.\"","points":10,"badge":"Tiêu đề cấp độ"},{"id":"p2_q8","section":"section2","title":"Mối quan hệ trong cây thông tin HTML","question":"Trong cây thông tin (Hình 7.4 SGK trang 42), mối quan hệ giữa <html> với <head> và <body> là mối quan hệ gì?","options":["Quan hệ anh em cùng cấp","Quan hệ Cha - Con (<html> là nút cha, <head> và <body> là hai nút con)","Quan hệ độc lập không lồng nhau","Quan hệ kế thừa ngược (con chứa cha)"],"correctAnswerIndex":1,"explanation":"SGK trang 42 & 43: \"Cấu trúc chung của một trang web có thể hình dung như một cây thông tin các phần tử HTML có quan hệ cha con (lồng nhau), nút gốc (root) là phần tử <html>.\"","points":15,"badge":"Cây thông tin DOM"},{"id":"p3_q1","section":"section3","title":"Phần mềm soạn thảo văn bản đơn giản","question":"Phần mềm soạn thảo văn bản đơn giản, không định dạng có sẵn trên hệ điều hành Windows là gì?","options":["Microsoft Word","Notepad (trên macOS tương tự là TextEdit)","Sublime Text","Adobe Photoshop"],"correctAnswerIndex":1,"explanation":"SGK trang 43: \"Notepad là phần mềm soạn thảo văn bản đơn giản không định dạng, cung cấp một số chức năng chỉnh sửa cơ bản, có sẵn trên Windows. Trên macOS có phần mềm tương tự là TextEdit.\"","points":10,"badge":"Soạn thảo đơn giản"},{"id":"p3_q2","section":"section3","title":"Chọn ngôn ngữ HTML trong Notepad++","question":"Trong phần mềm Notepad++, để hiển thị và hỗ trợ soạn thảo đúng ngôn ngữ HTML, ta thực hiện lệnh nào?","options":["File -> New -> Web","Language -> H -> HTML","View -> HTML Mode","Settings -> Preferences -> Format"],"correctAnswerIndex":1,"explanation":"SGK trang 43 (Lưu ý): \"Để phần mềm hiển thị và hỗ trợ soạn thảo đúng HTML cần thực hiện lệnh Language -> H -> HTML để chọn ngôn ngữ HTML.\"","points":15,"badge":"Thao tác Notepad++"},{"id":"p3_q3","section":"section3","title":"Chọn ngôn ngữ HTML trong Sublime Text","question":"Trong phần mềm Sublime Text, để hiển thị và hỗ trợ soạn thảo đúng theo ngôn ngữ HTML, ta thực hiện lệnh nào?","options":["View -> Syntax -> HTML","File -> Encoding -> UTF-8","Language -> Select -> HTML","Tools -> Build -> Web"],"correctAnswerIndex":0,"explanation":"SGK trang 43 (Lưu ý): \"Để phần mềm hiển thị và hỗ trợ soạn thảo đúng theo ngôn ngữ HTML cần thực hiện lệnh View -> Syntax -> HTML để chọn ngôn ngữ HTML.\"","points":15,"badge":"Thao tác Sublime Text"},{"id":"p3_q4","section":"section3","title":"Trang web hỗ trợ soạn thảo HTML trực tuyến","question":"Đặc điểm nào sau đây mô tả đúng về các trang web hỗ trợ soạn thảo HTML trực tuyến (ví dụ: w3schools.com, tutorialspoint.com)?","options":["Không cần máy tính, chỉ cần sổ ghi chép","Cần kết nối Internet, giao diện 2 khung: khung trái soạn mã, nháy nút Run để quan sát ngay kết quả hiển thị ở khung phải","Bắt buộc phải trả phí bản quyền hàng tháng","Chỉ chạy được trên hệ điều hành Linux"],"correctAnswerIndex":1,"explanation":"SGK trang 44: \"Ví dụ Hình 7.6 là giao diện soạn thảo HTML trực tuyến. Việc soạn thảo HTML được thực hiện tại khung bên trái, nháy nút Run để kiểm tra kết quả tại khung bên phải. Một số trang phổ biến: w3schools.com, tutorialspoint.com...\"","points":15,"badge":"Soạn thảo online"},{"id":"p3_q5","section":"section3","title":"Phân loại phần mềm soạn thảo và trình duyệt","question":"Trong các phần mềm sau: a) Notepad, b) Opera, c) Sublime Text, d) Chrome, e) Cốc Cốc, f) Notepad++, g) FireFox, h) Microsoft Edge. Đâu là nhóm CÁC TRÌNH DUYỆT WEB?","options":["Notepad, Sublime Text, Notepad++","Opera, Chrome, Cốc Cốc, FireFox, Microsoft Edge","Notepad, Chrome, Opera, Sublime Text","TextEdit, Notepad++, Opera, Chrome"],"correctAnswerIndex":1,"explanation":"SGK trang 44 (Câu hỏi 1): Nhóm trình duyệt web gồm: Opera, Chrome, Cốc Cốc, FireFox, Microsoft Edge. Nhóm phần mềm soạn thảo gồm: Notepad, Sublime Text, Notepad++.","points":15,"badge":"Phân loại phần mềm"},{"id":"p3_q6","section":"section3","title":"Lịch sử phát triển HTML","question":"Ai là người đưa ra các chuẩn HTML đầu tiên vào những năm 1990 tại CERN và phiên bản HTML5 ra đời vào năm nào?","options":["Bill Gates - năm 2000","Tim Berners-Lee - năm 2014","Steve Jobs - năm 2010","Mark Zuckerberg - năm 2018"],"correctAnswerIndex":1,"explanation":"SGK trang 45: \"Các chuẩn HTML của trang web hiện nay được nhà vật lí Tim Berners-Lee đưa ra lần đầu tiên vào những năm 1990... Phiên bản hiện tại là HTML5 ra đời năm 2014.\"","points":15,"badge":"Lịch sử công nghệ"}];
+    const ALL_STUDENTS = [{"id":"hs01","name":"Nguyễn Văn An","group":"Nhóm 1 (Tổ 1)","score":0},{"id":"hs02","name":"Trần Thị Bình","group":"Nhóm 1 (Tổ 1)","score":0},{"id":"hs03","name":"Lê Hoàng Cường","group":"Nhóm 1 (Tổ 1)","score":0},{"id":"hs04","name":"Phạm Minh Đức","group":"Nhóm 2 (Tổ 2)","score":0},{"id":"hs05","name":"Hoàng Thu Giang","group":"Nhóm 2 (Tổ 2)","score":0},{"id":"hs06","name":"Đỗ Hải Hà","group":"Nhóm 2 (Tổ 2)","score":0},{"id":"hs07","name":"Vũ Quốc Hưng","group":"Nhóm 3 (Tổ 3)","score":0},{"id":"hs08","name":"Đặng Mai Lan","group":"Nhóm 3 (Tổ 3)","score":0},{"id":"hs09","name":"Bùi Tuấn Nam","group":"Nhóm 3 (Tổ 3)","score":0},{"id":"hs10","name":"Ngô Phương Oanh","group":"Nhóm 4 (Tổ 4)","score":0},{"id":"hs11","name":"Lý Trọng Quân","group":"Nhóm 4 (Tổ 4)","score":0},{"id":"hs12","name":"Trịnh Thanh Thảo","group":"Nhóm 4 (Tổ 4)","score":0}];
+
+    let userState = {
+      name: 'Đội Lớp 12',
+      score: 0,
+      correct: 0,
+      activeSection: 'section1',
+      p1Index: 0,
+      p2Index: 0,
+      p3Index: 0
+    };
+
+    function switchTab(tabKey) {
+      AudioEngine.playTick();
+      document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
+      document.querySelectorAll('.btn-nav').forEach(el => el.classList.remove('active'));
+      
+      const tabEl = document.getElementById('tab-' + tabKey);
+      if (tabEl) tabEl.style.display = 'block';
+
+      // button highlight
+      if (event && event.target && event.target.classList.contains('btn-nav')) {
+        event.target.classList.add('active');
+      }
+    }
+
+    function renderQuiz(sectionId, containerId, qIndexKey, progressId) {
+      const questions = ALL_QUESTIONS.filter(q => q.section === sectionId);
+      const currIdx = userState[qIndexKey];
+      const container = document.getElementById(containerId);
+      const progressEl = document.getElementById(progressId);
+
+      if (!container) return;
+      if (progressEl) progressEl.innerText = "Câu hỏi " + (currIdx + 1) + " / " + questions.length;
+
+      if (currIdx >= questions.length) {
+        container.innerHTML = `
+          <div style="text-align:center; padding:2rem 1rem;">
+            <div style="font-size:3rem; margin-bottom:1rem;">🎉</div>
+            <h3 style="color:#10b981; font-size:1.4rem; margin-bottom:0.5rem;">Chúc mừng em đã hoàn thành phần này!</h3>
+            <p style="color:#cbd5e1; margin-bottom:1.5rem;">Em đã xuất sắc chinh phục các kiến thức trong bài học.</p>
+            <button class="btn-primary" onclick="restartSection('${qIndexKey}', '${sectionId}', '${containerId}', '${progressId}')">🔄 Luyện tập lại phần này</button>
+          </div>
+        `;
+        return;
+      }
+
+      const q = questions[currIdx];
+      let html = `
+        <div class="question-box">
+          <div style="color:#94a3b8; font-size:0.85rem; font-weight:600;">${q.title} (${q.points} điểm)</div>
+          <div class="question-text">${q.question}</div>
+          <div class="options-grid">
+      `;
+
+      q.options.forEach((opt, idx) => {
+        html += `<button class="option-btn" onclick="submitAnswer('${sectionId}', ${currIdx}, ${idx}, this, '${qIndexKey}', '${containerId}', '${progressId}')">
+          <strong style="margin-right:0.5rem; color:#60a5fa;">${String.fromCharCode(65 + idx)}.</strong> ${opt}
+        </button>`;
+      });
+
+      html += `</div><div id="explanation-box" style="display:none; margin-top:1rem; padding:1rem; background:#0f172a; border-radius:8px; border-left:4px solid #3b82f6;"></div></div>`;
+      container.innerHTML = html;
+    }
+
+    function submitAnswer(sectionId, qIdx, selectedIdx, btnEl, qIndexKey, containerId, progressId) {
+      const questions = ALL_QUESTIONS.filter(q => q.section === sectionId);
+      const q = questions[qIdx];
+      const allBtns = btnEl.parentElement.querySelectorAll('.option-btn');
+      allBtns.forEach(b => b.disabled = true);
+
+      const expBox = document.getElementById('explanation-box');
+
+      if (selectedIdx === q.correctAnswerIndex) {
+        btnEl.classList.add('correct');
+        AudioEngine.playSuccess();
+        userState.score += q.points;
+        userState.correct += 1;
+        updateScoreboard();
+        if (expBox) {
+          expBox.style.display = 'block';
+          expBox.style.borderLeftColor = '#10b981';
+          expBox.innerHTML = `<strong style="color:#34d399;">✓ Chính xác!</strong><div style="color:#cbd5e1; margin-top:0.35rem; font-size:0.9rem;">${q.explanation}</div>`;
+        }
+      } else {
+        btnEl.classList.add('wrong');
+        if (allBtns[q.correctAnswerIndex]) allBtns[q.correctAnswerIndex].classList.add('correct');
+        AudioEngine.playWrong();
+        if (expBox) {
+          expBox.style.display = 'block';
+          expBox.style.borderLeftColor = '#ef4444';
+          expBox.innerHTML = `<strong style="color:#f87171;">✗ Chưa chính xác!</strong><div style="color:#cbd5e1; margin-top:0.35rem; font-size:0.9rem;">${q.explanation}</div>`;
+        }
+      }
+
+      setTimeout(() => {
+        userState[qIndexKey]++;
+        renderQuiz(sectionId, containerId, qIndexKey, progressId);
+      }, 2500);
+    }
+
+    function restartSection(qIndexKey, sectionId, containerId, progressId) {
+      userState[qIndexKey] = 0;
+      renderQuiz(sectionId, containerId, qIndexKey, progressId);
+    }
+
+    function updateScoreboard() {
+      document.getElementById('scoreDisplay').innerText = userState.score;
+      document.getElementById('correctDisplay').innerText = userState.correct;
+    }
+
+    function changePlayerName() {
+      const newName = prompt('Nhập tên học sinh hoặc nhóm thi đấu:', userState.name);
+      if (newName && newName.trim()) {
+        userState.name = newName.trim();
+        document.getElementById('currentPlayerDisplay').innerText = userState.name;
+      }
+    }
+
+    // Live HTML Sandbox Runner
+    function runSandboxCode() {
+      AudioEngine.playTick();
+      const code = document.getElementById('sandboxCode').value;
+      const preview = document.getElementById('sandboxPreview');
+      preview.innerHTML = code;
+    }
+
+    // Random Picker
+    function openPicker() {
+      document.getElementById('pickerModal').style.display = 'flex';
+    }
+    function closePicker() {
+      document.getElementById('pickerModal').style.display = 'none';
+    }
+    function spinStudent() {
+      const res = document.getElementById('pickerResult');
+      const sub = document.getElementById('pickerSub');
+      let count = 0;
+      const timer = setInterval(() => {
+        AudioEngine.playTick();
+        const rand = ALL_STUDENTS[Math.floor(Math.random() * ALL_STUDENTS.length)];
+        res.innerText = rand.name;
+        sub.innerText = rand.group;
+        count++;
+        if (count > 16) {
+          clearInterval(timer);
+          AudioEngine.playSuccess();
+        }
+      }, 70);
+    }
+    function spinGroup() {
+      const groups = ['Nhóm 1 (Tổ 1)', 'Nhóm 2 (Tổ 2)', 'Nhóm 3 (Tổ 3)', 'Nhóm 4 (Tổ 4)'];
+      const res = document.getElementById('pickerResult');
+      const sub = document.getElementById('pickerSub');
+      let count = 0;
+      const timer = setInterval(() => {
+        AudioEngine.playTick();
+        const rand = groups[Math.floor(Math.random() * groups.length)];
+        res.innerText = rand;
+        sub.innerText = 'Đội được chọn trả lời!';
+        count++;
+        if (count > 14) {
+          clearInterval(timer);
+          AudioEngine.playSuccess();
+        }
+      }, 80);
+    }
+
+    // Leaderboard & SQLite
+    function openLeaderboard() {
+      renderLeaderboard();
+      document.getElementById('leaderboardModal').style.display = 'flex';
+    }
+    function closeLeaderboard() {
+      document.getElementById('leaderboardModal').style.display = 'none';
+    }
+    function renderLeaderboard() {
+      const tbody = document.getElementById('leaderboardBody');
+      tbody.innerHTML = `
+        <tr>
+          <td>🥇 1</td>
+          <td><strong>${userState.name}</strong> (Hiện tại)</td>
+          <td style="color:#f59e0b; font-weight:bold;">${userState.score}</td>
+          <td style="color:#94a3b8; font-size:0.85rem;">Vừa xong</td>
+        </tr>
+        <tr>
+          <td>🥈 2</td>
+          <td>Nhóm 2 (Tổ 2)</td>
+          <td style="color:#f59e0b; font-weight:bold;">180</td>
+          <td style="color:#94a3b8; font-size:0.85rem;">10 phút trước</td>
+        </tr>
+        <tr>
+          <td>🥉 3</td>
+          <td>Nguyễn Văn An</td>
+          <td style="color:#f59e0b; font-weight:bold;">150</td>
+          <td style="color:#94a3b8; font-size:0.85rem;">Hôm nay</td>
+        </tr>
+      `;
+    }
+    function resetScores() {
+      if (confirm('Em có chắc chắn muốn đặt lại điểm số không?')) {
+        userState.score = 0;
+        userState.correct = 0;
+        updateScoreboard();
+        renderLeaderboard();
+      }
+    }
+
+    function downloadSqliteScript() {
+      const sql = `-- DATABASE SQLITE EXPORT BÀI 7 TIN HỌC 12 KNTT
+CREATE TABLE IF NOT EXISTS players (id TEXT PRIMARY KEY, name TEXT, score INTEGER);
+INSERT INTO players VALUES ('p1', '${userState.name}', ${userState.score});
+`;
+      const blob = new Blob([sql], { type: 'text/sql' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'tin12_bai7_sqlite.sql';
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    // Guide Modal
+    function openGuide() {
+      document.getElementById('guideModal').style.display = 'flex';
+    }
+    function closeGuide() {
+      document.getElementById('guideModal').style.display = 'none';
+    }
+
+    // Init first view
+    window.addEventListener('DOMContentLoaded', () => {
+      renderQuiz('section1', 'quiz-p1-container', 'p1Index', 'p1-progress');
+      renderQuiz('section2', 'quiz-p2-container', 'p2Index', 'p2-progress');
+      renderQuiz('section3', 'quiz-p3-container', 'p3Index', 'p3-progress');
+      runSandboxCode();
+    });
+  </script>
+</body>
+</html>
